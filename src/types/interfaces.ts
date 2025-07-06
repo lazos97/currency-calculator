@@ -12,3 +12,15 @@ export interface IUser extends Document {
   password: string
   type: UserType
 }
+
+export interface ILoginPayload {
+  email: string
+  password: string
+}
+
+export interface ICurrency extends Document {
+  name: string
+  country: string
+  code: string
+  ratio: number
+}

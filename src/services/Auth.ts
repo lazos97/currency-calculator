@@ -1,16 +1,76 @@
-import { Request, Response } from 'express'
+import { ILoginPayload, IUser } from '../types/interfaces'
+import { Model } from 'mongoose'
+import User from '../models/User'
+import { BadRequest } from '../exceptions/BadRequest'
+import { checkPassword, hashPassword } from '../helpers/bcrypt'
+import { UserType } from '../types/enum'
 
 export class AuthService {
-  constructor() {}
-  public register() {
-    return 'register heloo'
+  private model: Model<IUser>
+  constructor() {
+    this.model = User
   }
 
-  public login() {
-    return 'login heloo'
+  public async register(payload: IUser) {
+    await this.validateUserPayload(payload)
+
+    const userCount = await this.model.countDocuments()
+    if (userCount === 0) {
+      payload.type = UserType.Editor
+    }
+
+    payload.password = await hashPassword(payload.password)
+    const user = await this.model.create(payload)
+
+    return this.returnUserWithoutPassword(user)
+  }
+
+  public async login(payload: ILoginPayload) {
+    const user = await this.model.findOne({ email: payload.email })
+    if (!user) {
+      throw new BadRequest('Something went wrong with credentials')
+    }
+
+    const isTheSame = await checkPassword(payload.password, user.password)
+    if (!isTheSame) {
+      throw new BadRequest('Something went wrong with credentials')
+    }
+
+    return this.returnUserWithoutPassword(user)
   }
 
   public logout() {
-    return 'logout heloo'
+    return 'malakies'
+  }
+
+  private returnUserWithoutPassword(user: IUser) {
+    const userObject: IUser = user.toObject()
+    delete userObject.password
+
+    return userObject
+  }
+
+  private async validateUserPayload(payload: IUser) {
+    if (payload.type) {
+      throw new BadRequest('Type is not allowed to be provided!')
+    }
+
+    if (!payload.password && !payload.email && !payload.username) {
+      throw new BadRequest('Please privide, email, password and username!')
+    }
+
+    if (payload.password.length < 3) {
+      throw new BadRequest('Password must be bigger than 3 digits!')
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+    if (!emailRegex.test(payload.email)) {
+      throw new BadRequest('Please provide a valid email address!')
+    }
+
+    const existingUser = await this.model.findOne({ email: payload.email })
+    if (existingUser) {
+      throw new BadRequest('This email is already in use!')
+    }
   }
 }

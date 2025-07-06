@@ -1,6 +1,4 @@
-import { CustomError } from './CustomError'
-
-export class Forbidden extends CustomError {
+export class Forbidden extends Error {
   statusCode: number
   constructor(message: string) {
     super(message)

@@ -1,6 +1,4 @@
-import { CustomError } from './CustomError'
-
-export class NotFound extends CustomError {
+export class NotFound extends Error {
   statusCode: number
   constructor(message: string) {
     super(message)
