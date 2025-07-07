@@ -5,12 +5,3 @@ export class Internal extends Error {
     this.statusCode = 500
   }
 }
-
-export class CustomAPIError extends Error {
-  statusCode: number
-  msg: string
-  constructor(msg: string, status: number) {
-    super(msg)
-    this.statusCode = status
-  }
-}

@@ -40,14 +40,33 @@ export class CurrencyService {
   }
 
   public async updateCurrency(id: string, payload: ICurrency) {
-    const existing = await this.model.findOne({ code: payload.code })
-    if (existing && existing._id.toString() !== id) {
-      throw new BadRequest('Currency with this code already exists')
+    const currency = await this.model.findById(id)
+
+    if (payload.code) {
+      const existingCurrency = await this.model.findOne({
+        code: payload.code
+      })
+
+      if (existingCurrency && existingCurrency._id.toString() !== id) {
+        throw new BadRequest('This code already exists')
+      }
     }
-    const currency = await this.model.findByIdAndUpdate(id, payload, {
-      new: true
-    })
-    return currency
+
+    if (payload.ratio) {
+      if (currency.code === 'USD' && payload.ratio !== 1) {
+        throw new BadRequest('Base currency must be 1 at ratio!')
+      }
+    }
+
+    const updatedCurrency = await this.model.findByIdAndUpdate(
+      id,
+      payload,
+      {
+        new: true
+      }
+    )
+
+    return updatedCurrency
   }
 
   public async deleteCurrency(id: string) {
@@ -71,6 +90,6 @@ export class CurrencyService {
       throw new NotFound('One or both currencies does not exists!')
     }
 
-    return amount * (currencyFrom.ratio / currencyTo.ratio)
+    return (currencyFrom.ratio / currencyTo.ratio) * amount
   }
 }

@@ -24,3 +24,14 @@ export interface ICurrency extends Document {
   code: string
   ratio: number
 }
+
+export interface IUserToken extends IUser {
+  token: string
+}
+
+export interface ITokenPayload {
+  email: string
+  type: UserType
+  username: string
+  _id: string
+}

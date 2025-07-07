@@ -1,9 +1,10 @@
-import { ILoginPayload, IUser } from '../types/interfaces'
+import { ILoginPayload, IUser, IUserToken } from '../types/interfaces'
 import { Model } from 'mongoose'
 import User from '../models/User'
 import { BadRequest } from '../exceptions/BadRequest'
 import { checkPassword, hashPassword } from '../helpers/bcrypt'
 import { UserType } from '../types/enum'
+import { generateToken } from '../helpers/jwt'
 
 export class AuthService {
   private model: Model<IUser>
@@ -22,7 +23,16 @@ export class AuthService {
     payload.password = await hashPassword(payload.password)
     const user = await this.model.create(payload)
 
-    return this.returnUserWithoutPassword(user)
+    const tokenPayload = {
+      _id: user._id.toString(),
+      email: user.email,
+      username: user.username,
+      type: user.type
+    }
+
+    const token = generateToken(tokenPayload)
+
+    return this.returnUserWithoutPassword(user, token)
   }
 
   public async login(payload: ILoginPayload) {
@@ -36,16 +46,27 @@ export class AuthService {
       throw new BadRequest('Something went wrong with credentials')
     }
 
-    return this.returnUserWithoutPassword(user)
+    const tokenPayload = {
+      _id: user._id.toString(),
+      email: user.email,
+      username: user.username,
+      type: user.type
+    }
+
+    const token = generateToken(tokenPayload)
+
+    return this.returnUserWithoutPassword(user, token)
   }
 
   public logout() {
-    return 'malakies'
+    return 'User Logged out'
   }
 
-  private returnUserWithoutPassword(user: IUser) {
-    const userObject: IUser = user.toObject()
+  private returnUserWithoutPassword(user: IUser, token: string) {
+    const userObject: IUserToken = user.toObject()
     delete userObject.password
+
+    userObject.token = token
 
     return userObject
   }
