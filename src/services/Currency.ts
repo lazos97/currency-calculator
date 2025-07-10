@@ -90,6 +90,6 @@ export class CurrencyService {
       throw new NotFound('One or both currencies does not exists!')
     }
 
-    return (currencyFrom.ratio / currencyTo.ratio) * amount
+    return (currencyTo.ratio / currencyFrom.ratio) * amount
   }
 }
