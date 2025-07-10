@@ -15,7 +15,7 @@ export class CurrencyController {
       const currency = await this.service.createCurrency(req.body)
       res
         .status(201)
-        .json({ message: 'Currency succefully created ', currency })
+        .json({ message: 'Currency succefully created', data: currency })
     } catch (err) {
       next(err)
     }
@@ -28,9 +28,10 @@ export class CurrencyController {
   ) => {
     try {
       const currencies = await this.service.getAllCurrencies()
-      res
-        .status(200)
-        .json({ message: 'Succefully fetched currencies', currencies })
+      res.status(200).json({
+        message: 'Succefully fetched currencies',
+        data: currencies
+      })
     } catch (err) {
       next(err)
     }
@@ -45,7 +46,7 @@ export class CurrencyController {
       const currency = await this.service.getCurrencyById(req.params.id)
       res
         .status(200)
-        .json({ message: 'Succefully fetched currency', currency })
+        .json({ message: 'Succefully fetched currency', data: currency })
     } catch (err) {
       next(err)
     }
@@ -63,7 +64,7 @@ export class CurrencyController {
       )
       res
         .status(200)
-        .json({ message: 'Succefully updated currency', currency })
+        .json({ message: 'Succefully updated currency', data: currency })
     } catch (err) {
       next(err)
     }

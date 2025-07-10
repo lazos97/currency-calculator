@@ -76,7 +76,7 @@ export class AuthService {
       throw new BadRequest('Type is not allowed to be provided!')
     }
 
-    if (!payload.password && !payload.email && !payload.username) {
+    if (!payload.password || !payload.email || !payload.username) {
       throw new BadRequest('Please privide, email, password and username!')
     }
 

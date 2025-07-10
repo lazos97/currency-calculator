@@ -21,7 +21,7 @@ export const authenticate = async (
       throw new Internal('JWT_SECRET is not defined')
     }
 
-    jwt.verify(token, process.env.JWT_SECRET)
+    const user = jwt.verify(token, process.env.JWT_SECRET)
 
     next()
   } catch (error) {

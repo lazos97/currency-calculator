@@ -16,7 +16,7 @@ export class AuthController {
       const user = await this.service.register(req.body)
       res.status(201).json({
         message: 'User register successfully',
-        user: user
+        data: user
       })
     } catch (err) {
       next(err)
@@ -32,7 +32,7 @@ export class AuthController {
       const user = await this.service.login(req.body)
       res.status(200).json({
         message: 'User succesfully logged in',
-        user
+        data: user
       })
     } catch (err) {
       next(err)
